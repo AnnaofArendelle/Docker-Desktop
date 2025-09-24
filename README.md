@@ -18,7 +18,7 @@ To run Windows app, install Wine: https://wiki.winehq.org/Ubuntu
 
 # Limitations & bugs
 - No hardware acceleration because Codespace does not have a GPU
-- Terminal won't open. May work if you use Ubuntu 20.04
+- Terminal won't open. Use Xfce Terminal or others instead
 
 # Screenshots
 
