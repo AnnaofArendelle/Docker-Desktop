@@ -1,7 +1,7 @@
 # Cinnamon Desktop On Github Codespace
-This configuration will install a Cinnamon desktop enviornment and automatically opens a VNC connection. 
+This setup installs an Ubuntu 24.04 container with the Cinnamon desktop environment and configures a VNC connection.
 
-Using desktop enviornment on Codespace is generally allowed since Microsoft themself provided a documentation setting up a Fluxbox based desktop and installing a browser; https://github.com/devcontainers/features/tree/main/src/desktop-lite, but we will use Cinnamon instead. You don't need to worry about getting banned as long as you don't abuse the service and don't violate Github ToS
+Running a desktop environment in Codespaces is generally permitted, as Microsoft themselves provide documentation for setting up a Fluxbox-based desktop with a browser: https://github.com/devcontainers/features/tree/main/src/desktop-lite. In this case, we’ll be using Cinnamon instead. You don’t need to worry about account issues as long as you use the service responsibly and stay within GitHub’s Terms of Service.
 
 # How to use
 1. Create a new space: https://github.com/codespaces/new
