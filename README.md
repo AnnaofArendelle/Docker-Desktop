@@ -6,7 +6,6 @@
 [![](https://img.shields.io/badge/管理穿透IP-orange?style=for-the-badge&logo=github)](https://login.tailscale.com/admin/machines)
 [![](https://img.shields.io/badge/Fork仓库-8A2BE2?style=for-the-badge&logo=github)](https://github.com/MaxCauIfield/codespace-desktop/fork)
 
----
 ## 介绍：
 此设置将安装一个搭载 Cinnamon 桌面环境的 Ubuntu 24.04 容器，并配置 VNC 连接。
 ## 如何使用？
