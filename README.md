@@ -1,15 +1,11 @@
 # GitHub Codespaces 上的 Cinnamon 桌面环境
 此设置将安装一个搭载 Cinnamon 桌面环境的 Ubuntu 24.04 容器，并配置 VNC 连接。
 
----
-
+# 管理控制台
 [![](https://img.shields.io/badge/创建容器-brightgreen?style=for-the-badge&logo=github)](https://github.com/codespaces/new)
 [![](https://img.shields.io/badge/管理容器-blue?style=for-the-badge&logo=github)](https://github.com/codespaces)
 [![](https://img.shields.io/badge/复制连接IP-orange?style=for-the-badge&logo=github)](https://login.tailscale.com/admin/machines)
 [![](https://img.shields.io/badge/Fork仓库-8A2BE2?style=for-the-badge&logo=github)](https://github.com/MaxCauIfield/codespace-desktop/fork)
-
----
-
 ## 如何使用？
 ### 需求
 一个Tailscale账户，注册地址： https://login.tailscale.com/admin/machines
