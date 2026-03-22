@@ -8,5 +8,5 @@
 
   "postCreateCommand": "pipx install numpy && mkdir -p ~/.vnc && printf 'password\n' | vncpasswd -f > ~/.vnc/passwd && chmod 600 ~/.vnc/passwd && git clone https://github.com/novnc/noVNC.git && chmod +x .devcontainer/tailscale-login.sh",
 
-  "postStartCommand": "bash -ic '.devcontainer/tailscale-login.sh' && vncserver -xstartup 'cinnamon-session' -rfbport 5900 & ./noVNC/utils/novnc_proxy --vnc 127.0.0.1:5900 --listen localhost:6080 &"
+  "postStartCommand": "code --command workbench.action.terminal.new && code --command workbench.action.terminal.sendSequence \"bash -ic '.devcontainer/tailscale-login.sh'\" && vncserver -xstartup 'cinnamon-session' -rfbport 5900 & ./noVNC/utils/novnc_proxy --vnc 127.0.0.1:5900 --listen localhost:6080 &"
 }
