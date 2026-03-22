@@ -13,7 +13,8 @@
 5. Once created, open PORTS tab, open forwarded address, click on `vnc.html` link and enter your VNC password
 
 默认的 VNC 密码仅为 `password`。您可以通过在终端中运行 `vncpasswd` 命令来更改它。您无需担心密码强度不足的问题，因为 VNC 端口默认并未对外公开；若要访问这些端口，必须先登录您的 GitHub 账号。这一机制极大地提升了安全性。
-已集成Tailscale到CodeSpace中，首次部署时，会在Terminal中显示Tailscale的授权链接，若未能找到，您可在终端中执行sudo tailscale up来解决，完成授权后，后续启动桌面环境时会自动运行Tailscale，您无需执行任何操作，直接使用VNC连接即可
+
+已集成Tailscale到CodeSpace中，首次部署时，会在Terminal中显示Tailscale的授权链接，若未能找到，您可在终端中执行 `sudo tailscale up` 来解决，完成授权后，后续启动桌面环境时会自动运行Tailscale，您无需执行任何操作，直接使用VNC连接即可
 
 默认键盘布局为英语（美国）。您可以在 Cinnamon 设置中进行更改。
 
