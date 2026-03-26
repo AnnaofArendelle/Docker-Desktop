@@ -7,8 +7,16 @@
 [![](https://img.shields.io/badge/管理穿透IP-orange?style=for-the-badge&logo=github)](https://login.tailscale.com/admin/machines)
 [![](https://img.shields.io/badge/管理AUTHKEY-orange?style=for-the-badge&logo=github)](https://login.tailscale.com/admin/settings/keys)
 [![](https://img.shields.io/badge/Fork仓库-8A2BE2?style=for-the-badge&logo=github)](https://github.com/MaxCauIfield/codespace-desktop/fork)
-## 介绍：
-一个基于CodeSpaceIDE，搭载 Cinnamon 桌面环境的 Ubuntu 24.04 容器，使用Tailscale转发IP地址，并配置网页和客户端的 VNC 连接。
+## 介绍
+![2024-05-31 20 36 02](https://github.com/AndnixSH/codespace-desktop/assets/40742924/efe23986-9024-457f-8e10-d04ac1898b18)
+
+一个基于CodeSpaceIDE，搭载 Cinnamon 桌面环境的 Ubuntu 24.04 容器。
+## 核心特色
+- ​🌐 **混合组网** 支持客户端/网页两种登录方式登录VNC环境，敏感认证均有环境变量保护
+- ​🛡️ **安全传输** 所有端口与访问需经过Github认证+Tailscale加密传输，深度保障访问安全
+- ​📦 **开箱即用** 详细的文档，精心的配置流程，自动化的流程，本土化适配，方便省心
+- ​🚀 **性能优化** 默认1280x720分辨率，轻量桌面，极简高效，原生VNC协议，传输效率高
+- ​🛠️ **工具集成** 核心组件与扩展包分离，模块设计灵活选装，开发者友好，适配不同场景
 ## 快速部署
 ### 需求
 - Fork此项目，并点上Star
@@ -44,7 +52,7 @@ sudo tailscale up
 #### 网页连接
 创建完成后, 打开 PORTS 标签页, 访问转发地址, 点击 `vnc.html` 并输入你的VNC密码
 
-默认的 VNC 密码仅为 `password`。您可以通过在终端中运行 `vncpasswd` 命令来更改它。您无需担心密码强度不足的问题，因为 VNC 端口默认并未对外公开；若要访问这些端口，必须先登录您的 GitHub 账号。这一机制极大地提升了安全性。
+默认的 VNC 密码仅为 `password`。您可以通过在终端中运行 `vncpasswd` 命令来更改它。
 
 
 默认键盘布局和语言为中文（中国）。您可以在 Cinnamon 设置中进行更改。
@@ -61,7 +69,7 @@ sudo tailscale up
 因此，请负责任地使用该服务，并严格遵守 GitHub 的《服务条款》，就无需担心任何账号方面的问题。
 ## 局限性与错误
 - 无法启用硬件加速，因为 Codespace 不具备 GPU
-- 终端无法打开。请改用 Xfce Terminal 或其他终端工具，系统语言
+- 终端无法打开。请改用 Xfce Terminal 或其他终端工具，系统语言汉化不完整
 - 由于Tailscale的限制，AuthKey有效期最长为90天，过期后请重新生成Key，并将其填入仓库的环境变量中
 
 ## 截图
