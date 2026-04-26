@@ -13,11 +13,12 @@
 
 一个基于CodeSpaceIDE，搭载 Cinnamon 桌面环境的 Ubuntu 24.04 容器。
 ## ✨ 核心特色
-- ​🌐 **混合组网** 支持客户端/网页两种登录方式，敏感认证均有环境变量保护
+- ​🌐 **混合组网** 支持RDP/VNC/网页三种登录方式，敏感认证均有环境变量保护
 - ​🛡️ **安全传输** 所有访问经过认证+加密传输，环境变量保护，深度保障安全
 - ​📦 **开箱即用** 详细的文档，精心的配置，自动化的流程，本土化适配
-- ​🚀 **性能优化** 1280x720原生VNC协议，轻量桌面，传输极简且高效
+- ​🚀 **性能优化** 1280x720原生VNC/RDP协议，轻量桌面，传输极简且高效
 - ​🛠️ **工具集成** 核心组件与扩展包分离，模块设计灵活选装，开发者友好
+- ​💻 **RDP支持** 新增Windows远程桌面协议支持，Windows用户可直接使用mstsc连接
 ## 💡 快速部署
 ### 需求
 - Fork此项目，并点上Star
@@ -40,9 +41,23 @@ TAILSCALE_AUTHKEY
 3. 选择区域，建议选择东南亚地区（**Southeast Asia**），延迟最低
 4. 选择机器类型，若要解锁更高级的机器类型, 请在Github上[提交工单](https://support.github.com/contact?tags=rr-codespaces%2Ccat_codespace)
 5. 点击 创建**CodeSpace（Create）**，创建过程需要耗费一些时间。
-### VNC连接
-提供2种不同的VNC连接方式，推荐使用Tailscale+VNC客户端连接
-#### 客户端连接
+### 连接方式
+提供3种不同的连接方式，推荐使用Tailscale+客户端连接
+
+#### 1. RDP连接 (推荐Windows用户)
+通过Windows自带的远程桌面客户端连接，体验最佳：
+
+1. 在 Tailscale 管理控制台获取 Codespace 的 IP 地址
+2. 打开 Windows 远程桌面连接 (mstsc)
+3. 输入 Tailscale IP 地址，点击连接
+4. 登录信息：
+   - **用户名**: `root` (或 `vscode`)
+   - **密码**: `password` (与VNC密码相同)
+5. 首次连接时会出现证书警告，点击"是"继续
+
+**注意**: RDP使用3389端口，已在devcontainer.json中配置转发
+
+#### 2. VNC客户端连接
 本项目已集成Tailscale，因此无需在服务端安装
 
 若服务未能启动，您可在终端中执行以下命令来重新启动Tailscale
@@ -50,7 +65,7 @@ TAILSCALE_AUTHKEY
 sudo tailscale up
 ```
 
-#### 网页连接
+#### 3. 网页连接 (Web VNC)
 创建完成后, 打开 PORTS 标签页, 访问转发地址, 点击 `vnc.html` 并输入你的VNC密码
 
 默认的 VNC 密码仅为 `password`。您可以通过在终端中运行 `vncpasswd` 命令来更改它。

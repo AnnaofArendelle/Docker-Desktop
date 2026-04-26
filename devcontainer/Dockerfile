@@ -51,3 +51,29 @@ ENV GLFW_IM_MODULE=ibus
 
 # 安装 Tailscale
 RUN curl -fsSL https://tailscale.com/install.sh | sh
+
+# 安装 xrdp (RDP服务器) 和 Xorg 后端
+RUN apt-get update && \
+    apt-get install -y \
+        xrdp \
+        xorgxrdp && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
+
+# 配置 xrdp 使用 Xvnc 后端连接到 TigerVNC
+RUN sed -i 's/^port=3350/port=-1/' /etc/xrdp/sesman.ini && \
+    sed -i 's/^ListenPort=3350/ListenPort=-1/' /etc/xrdp/sesman.ini && \
+    sed -i 's/^ssl_protocols=.*/ssl_protocols=TLSv1.2, TLSv1.3/' /etc/xrdp/xrdp.ini && \
+    sed -i 's/^crypt_level=.*/crypt_level=high/' /etc/xrdp/xrdp.ini && \
+    sed -i 's/^max_bpp=.*/max_bpp=24/' /etc/xrdp/xrdp.ini && \
+    sed -i 's/^#xserverbpp=24/xserverbpp=24/' /etc/xrdp/xrdp.ini
+
+# 设置 xrdp 用户权限
+RUN usermod -a -G ssl-cert xrdp && \
+    echo 'cinnamon-session' > /etc/skel/.xsession && \
+    cp /etc/skel/.xsession /root/.xsession && \
+    chown root:root /root/.xsession
+
+# 复制启动脚本
+COPY start-desktop.sh /usr/local/bin/start-desktop.sh
+RUN chmod +x /usr/local/bin/start-desktop.sh
