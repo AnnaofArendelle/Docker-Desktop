@@ -1,84 +1,47 @@
 #!/bin/bash
 
 #############################################################
-# Bash script to install xfce4 with VNC over ngrok and wine #
-# For Google Cloud Shell                                    #
-# Copyright 2022 giangvinhloc610                            #
+# Bash 脚本：在 Google Cloud Shell 中安装 xfce4、VNC、noVNC 和 Tailscale #
+# 默认使用 xfce 桌面和 VNC 服务器，不再安装 Wine 相关组件                 #
 #############################################################
 
-# Install vncserver & xfce4
-echo Installing vncserver and xfce4...
+set -e
+
+# 安装 VNC Server、xfce4 以及网页 VNC 依赖
+echo "开始安装 VNC Server、xfce4 和 noVNC..."
 sudo apt update
-sudo apt install tigervnc-standalone-server xfce4 xfce4-terminal xfce4-taskmanager dbus-x11 --no-install-recommends -y
+sudo apt install tigervnc-standalone-server xfce4 xfce4-terminal xfce4-taskmanager dbus-x11 novnc websockify -y
 
-# Setup wine apt repo
-echo Adding wine repo...
-sudo dpkg --add-architecture i386
-sudo wget -nc -O /usr/share/keyrings/winehq-archive.key https://dl.winehq.org/wine-builds/winehq.key
-sudo wget -nc -P /etc/apt/sources.list.d/ https://dl.winehq.org/wine-builds/debian/dists/bullseye/winehq-bullseye.sources
+# 配置 VNC xstartup
+echo "配置 VNC 桌面启动脚本..."
+mkdir -p "$HOME/.vnc"
+cat > "$HOME/.vnc/xstartup" <<'EOF'
+#!/bin/bash
+xrdb $HOME/.Xresources
+startxfce4 &
+EOF
+chmod +x "$HOME/.vnc/xstartup"
 
-# Temporary fix for GPG key error
-sudo mkdir -pm755 /etc/apt/keyrings
-sudo mv /usr/share/keyrings/winehq-archive.key /etc/apt/keyrings/winehq-archive.key
+# 启动 VNC 服务
+echo "启动 VNC 服务..."
+vncserver -geometry 1280x720 -depth 24 :1
 
-sudo apt update
+# 启动 noVNC 网页访问
+echo "启动 noVNC 网页访问..."
+nohup websockify --web=/usr/share/novnc/ 8080 localhost:5901 >/tmp/novnc.log 2>&1 &
 
-# Install wine
-echo Installing wine...
-sudo apt install --install-recommends winehq-staging -y
-echo 'export PATH=$PATH:/opt/wine-staging/bin' >> ~/.bashrc
+# 安装 Tailscale
+echo "安装 Tailscale..."
+curl -fsSL https://tailscale.com/install.sh | sh
 
-# Start vncserver
-vncserver
-export DISPLAY=:1
-xfce4-session &
+echo "请完成 Tailscale 登录授权，使用默认授权方式登录。"
+sudo tailscale up
 
-# Wait for xfce to output log
-sleep 5
+# 说明信息
+echo "------------------------------------------------------------"
+echo "安装完成。"
+echo "VNC 网页访问地址: http://127.0.0.1:8080/vnc.html"
+echo "Cloud Shell 将 $HOME 目录作为持久化存储，VNC 配置和桌面数据会保存在此目录。"
+echo "如果需要，可通过 Tailscale 访问此环境。"
+echo "------------------------------------------------------------"
 
-# Configure WINEPREFIX
-# Google Cloud Shell has a really small /home parition (5GB), so you might need to change the WINEPREFIX to somewhere else
-echo Google Cloud Shell has a small partition of 5GB, would you wish to set WINEPREFIX to /tmp, which has much more space?
-echo Please note that data outside $HOME will be deleted after each Google Cloud Shell session.
-read -p "Your choice [y/N]: " answer
-
-if [ "$answer" != "${answer#[Yy]}" ] ; then
-    mkdir /tmp/wineprefix
-    export WINEPREFIX=/tmp/wineprefix
-    echo 'export WINEPREFIX=/tmp/wineprefix' >> ~/.bashrc
-    echo Your WINEPREFIX will now be $WINEPREFIX
-fi
-
-# Install winetrick
-echo Installing winetricks...
-wget https://raw.githubusercontent.com/Winetricks/winetricks/master/src/winetricks
-chmod +x winetricks
-sudo mv winetricks /usr/bin/
-
-# wineboot
-echo Starting wineboot...
-wineboot &
-
-# Get ngrok
-wget https://bin.equinox.io/c/bNyj1mQVY4c/ngrok-v3-stable-linux-amd64.tgz
-tar -xvf ngrok-v3-stable-linux-amd64.tgz
-chmod +x ./ngrok
-sudo mv ngrok /usr/bin/ # Move to /usr/bin
-rm ngrok-v3-stable-linux-amd64.tgz # Clean up
-
-# ngrok login
-echo Now go to https://dashboard.ngrok.com/get-started/setup and find your token in step 2, then put it here:
-read token
-
-# Check if the user actually copy the whole add-authtoken command or just the token itself
-if [[ $token == *"add-authtoken"* ]]; then
-    $token
-else
-        ngrok config add-authtoken $token
-fi
-
-# Done, enjoy your wine
-echo Done, enjoy your Wine
-
-# Open ngrok tunnel
-ngrok tcp 5901 --region ap # You might change the region for selecting the closet server to your place :)
