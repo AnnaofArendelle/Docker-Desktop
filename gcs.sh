@@ -2,7 +2,7 @@
 
 # --- 用户配置区 ---
 NAME="tailscale-gcsvnc"
-PASS="gcsvnc"   # 请修改你的VNC密码
+PASS="password"   # 请修改你的VNC密码
 
 # 安装你需要的软件包 (桌面环境, 应用等)
 install_packages() {
