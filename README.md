@@ -137,6 +137,8 @@ sudo tailscale up
 
 #### 💖 本项目引用了以下开源代码
 - [AndnixSH/codespace-desktop](https://github.com/AndnixSH/codespace-desktop)
+- [ttasc/gcsvnc](https://github.com/ttasc/gcsvnc)
+- [raspiduino/winecloudshell](https://github.com/raspiduino/winecloudshell)
 - [shields.io(图标)](https://img.shields.io/)
 #### 🛠 本项目使用以下协议分发
 - GPL- v3.0
