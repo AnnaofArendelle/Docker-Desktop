@@ -1,7 +1,8 @@
 #!/bin/sh
 
 NAME="tailscale-gcsvnc"
-PASS="password"
+PASS="password"           # VNC密码
+SSH_PASS="password"       # SSH密码
 DOCKER_IMAGE="dorowu/ubuntu-desktop-lxde-vnc"
 TAILSCALE_AUTHKEY_FILE="$HOME/.tailscale_authkey"
 VNC_RESOLUTION="1280x720"
@@ -36,12 +37,23 @@ docker run -d --rm --net=host \
 docker run -d --name "${NAME}-vnc" --net=host \
     -v "$HOME:/root" \
     -e VNC_PASSWORD="$PASS" \
+    -e SSH_PASSWORD="$SSH_PASS" \
     -e LANG="zh_CN.UTF-8" \
     -e DISPLAY_WIDTH=1280 -e DISPLAY_HEIGHT=720 \
     -p 8080:8080 \
-    $DOCKER_IMAGE
-
-echo "=== 完成启动 ==="
-echo "VNC (Web): http://127.0.0.1:8080, 密码: $PASS"
-echo "SSH: ssh root@<Tailscale-IP>"
-echo "RDP: connect to <Tailscale-IP>:3389, resolution 1280x720"
+    $DOCKER_IMAGE /bin/sh -c "
+        # 设置中文
+        apt-get update && apt-get install -y language-pack-zh-hans locales sudo \
+        && locale-gen zh_CN.UTF-8 \
+        && update-locale LANG=zh_CN.UTF-8 \
+        # 安装 SSH 和 RDP
+        && apt-get install -y openssh-server xrdp \
+        && mkdir -p /var/run/sshd \
+        # 设置 root 密码
+        && echo 'root:$SSH_PASSWORD' | chpasswd \
+        # 启动服务
+        && service ssh start \
+        && service xrdp start \
+        # 启动 VNC
+        && vncserver :1 -geometry ${VNC_RESOLUTION} -depth 24 \
+        && echo 'Ready'"
