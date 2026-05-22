@@ -123,7 +123,7 @@ sudo tailscale up
 ## ⛔ 局限性与错误
 - 无法启用硬件加速，因为 Codespace 不具备 GPU，系统语言汉化不完整
 - 由于Tailscale的限制，AuthKey有效期最长为90天，过期后请重新生成Key，并将其填入仓库的环境变量中
-- ~~终端无法打开~~（已修复）
+- Cloudshell版本目前仅支持VNC连接，且只有HOME目录有持久化存储
 
 ## 🚀 网络优化
 容器已内置网络性能优化，针对Tailscale隧道进行了特别调整：
