@@ -197,6 +197,27 @@ else
     echo "  警告: SSH 服务可能未正常启动"
 fi
 
+# (可选) 启用 Cloudflare WARP 出口代理 —— 默认关闭，零感知
+# 仅当 Codespaces Secret 中设置 ENABLE_WARP=true 时才启用。
+# 详见 .devcontainer/extensions/warp.sh
+if [ "${ENABLE_WARP:-false}" = "true" ]; then
+    echo "[扩展] 检测到 ENABLE_WARP=true，启用 Cloudflare WARP 出口代理..."
+    # start-desktop.sh 会被复制到 /usr/local/bin，扩展脚本只在仓库工作区中，
+    # 因此在已知位置依次查找 extensions/warp.sh
+    WARP_EXT=""
+    for cand in \
+        "$(dirname "$0")/../extensions/warp.sh" \
+        /workspaces/*/.devcontainer/extensions/warp.sh \
+        "$HOME"/*/.devcontainer/extensions/warp.sh; do
+        if [ -f "$cand" ]; then WARP_EXT="$cand"; break; fi
+    done
+    if [ -n "$WARP_EXT" ]; then
+        bash "$WARP_EXT" up || echo "  [WARP] 启用失败，不影响其他服务"
+    else
+        echo "  [WARP] 未找到 extensions/warp.sh，跳过"
+    fi
+fi
+
 echo ""
 echo "========================================"
 echo "  所有服务已启动！"

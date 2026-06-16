@@ -146,6 +146,40 @@ sudo tailscale up
 
 如需调整分辨率或其他参数，请修改 `start-desktop.sh` 中的配置。
 
+## 🧩 可选扩展：Cloudflare WARP 出口代理
+
+将指定应用（默认 firefox）的出站流量经 Cloudflare WARP 出网，使**出口 IP 变为 Cloudflare 的共享 VPN IP**，而非 Codespace 的数据中心 IP。
+
+> **默认关闭，零感知。** 不设置开关时，容器行为与原来完全一致，不安装、不启动任何 WARP 组件。
+
+### 启用方式
+
+在仓库的 Codespaces Secrets（Settings → Secrets and variables → Codespaces）中新增：
+
+| 变量名 | 值 | 说明 |
+|--------|-----|------|
+| `ENABLE_WARP` | `true` | 开关。设为 `true` 才启用，删除或设为其他值即关闭 |
+| `WARP_LICENSE` | *(可选)* | WARP+ / Zero Trust 的 license key，留空用免费版 |
+| `WARP_PROXY_PORT` | *(可选)* | 本地 SOCKS5 端口，默认 `40000` |
+
+设置后**重建 Codespace** 即生效。启用时 firefox 会通过企业策略自动走 WARP，无需手动配置代理；关闭时策略自动移除。
+
+### 手动控制
+
+扩展也可在终端手动开关：
+
+```bash
+bash .devcontainer/extensions/warp.sh up       # 安装并启用
+bash .devcontainer/extensions/warp.sh status   # 查看状态与出口 IP
+bash .devcontainer/extensions/warp.sh down     # 断开并停止
+```
+
+### 工作原理与注意事项
+
+- 采用 WARP 的 **proxy 模式**（本地 SOCKS5），**不需要 TUN 设备**，与 Tailscale 的 `userspace-networking` 互不冲突：Tailscale SOCKS（`:1055`）负责入站访问，WARP SOCKS（`:40000`）负责指定应用出站。
+- ⚠️ **关于「纯净 IP」**：WARP 免费版出口是数百万用户共享的消费级 VPN IP 段。相比数据中心 IP，它更像「住宅级共享 IP」——对部分网站是改善，但 Google 等风控严格的站点会**专门标记 Cloudflare WARP 段**，可能触发更多验证。若需稳定纯净出口，需配合 WARP+ / Zero Trust 专用 egress。
+- 仅代理配置了 SOCKS 的应用（默认 firefox）。SSH/VNC/RDP 等访问通道不受影响，仍走 Tailscale。
+
 ## 🙏 鸣谢
 
 #### 💖 本项目引用了以下开源代码
