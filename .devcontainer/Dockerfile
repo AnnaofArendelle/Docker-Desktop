@@ -59,6 +59,7 @@ RUN apt-get update && \
         xrdp \
         xorgxrdp \
         openssh-server \
+        xauth \
         mosh && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
@@ -70,7 +71,7 @@ RUN mkdir -p /var/run/sshd && \
     sed -i 's/#PasswordAuthentication yes/PasswordAuthentication yes/' /etc/ssh/sshd_config && \
     sed -i 's/#X11Forwarding no/X11Forwarding yes/' /etc/ssh/sshd_config && \
     sed -i 's/#X11UseLocalhost yes/X11UseLocalhost no/' /etc/ssh/sshd_config && \
-    echo 'export DISPLAY=:1' >> /etc/profile
+    printf '# 仅当 DISPLAY 未设置时，才回退到本地 VNC 桌面 :1\n# ssh -X 登录时 sshd 已设好转发 DISPLAY (如 localhost:10.0)，此处不覆盖，X11 转发正常\n# 普通 ssh 登录时 DISPLAY 为空，回退到 :1 以便操作 VNC 桌面\nif [ -z "$DISPLAY" ]; then\n    export DISPLAY=:1\nfi\n' > /etc/profile.d/desktop-display.sh
 
 # 配置 xrdp 使用 Xvnc 后端连接到 TigerVNC
 RUN sed -i 's/^port=3350/port=-1/' /etc/xrdp/sesman.ini && \
