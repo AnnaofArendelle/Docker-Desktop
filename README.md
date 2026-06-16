@@ -71,6 +71,11 @@ TAILSCALE_AUTHKEY
 
 **注意**: SSH使用22端口，已在devcontainer.json中配置转发。首次连接需确认主机密钥指纹。
 
+> 💡 **慢链路/卡顿优化**：在双 NAT 或走中继的网络下，纯 SSH 打字会有明显延迟。推荐改用 **mosh**（已内置），它走 UDP + 本地预测回显，高延迟下体感接近“零延迟”，断线还能无缝重连：
+> ```bash
+> mosh --ssh="ssh -p 22" root@<Tailscale-IP>
+> ```
+
 #### 2. RDP连接 (推荐Windows用户)
 通过Windows自带的远程桌面客户端连接，体验最佳：
 
@@ -126,15 +131,18 @@ sudo tailscale up
 - Cloudshell版本目前仅支持VNC连接，且只有HOME目录有持久化存储
 
 ## 🚀 网络优化
-容器已内置网络性能优化，针对Tailscale隧道进行了特别调整：
+容器已针对慢链路/中继场景做了实际有效的调整：
 
 | 优化项 | 配置 | 效果 |
 |--------|------|------|
-| TCP Fast Open | 启用 | 减少连接建立延迟 |
-| BBR拥塞控制 | 启用 | 提升高延迟网络下的吞吐量 |
-| TCP缓冲区 | 16MB | 优化大带宽延迟积网络 |
-| VNC/RDP分辨率 | 1280x720 | 平衡清晰度与带宽占用 |
-| 压缩算法 | 启用 | 减少数据传输量 |
+| mosh | 内置 | UDP + 本地预测回显，高延迟下交互体感接近零延迟，断线无缝重连 |
+| VNC 色深 | 16 位 | 相比 24 位省约 1/3 带宽 |
+| VNC 编码 | 客户端设 Tight + JPEG 质量 4~6 | 减少图形数据传输量 |
+| VNC/RDP 分辨率 | 1280x720 | 平衡清晰度与带宽占用 |
+
+> ⚠️ 说明：早期版本写入的 BBR / TCP 缓冲区 / TCP Fast Open 等 sysctl 已移除。原因是 Tailscale 在 Codespaces 中以 `userspace-networking` 模式运行，隧道流量由 gVisor netstack 处理，不走宿主内核协议栈，这些内核 sysctl 对实际隧道流量无效。
+>
+> 双 NAT（两端均无公网 IP）场景下卡顿的主因是 Tailscale 回退到共享 DERP 中继。如需根本性提速，可自建 DERP 中继或改用 VPS 单跳反向隧道（rathole/frp）。
 
 如需调整分辨率或其他参数，请修改 `start-desktop.sh` 中的配置。
 

@@ -15,15 +15,6 @@ echo "  GitHub Codespace Desktop 启动脚本"
 echo "  分辨率: ${GEOMETRY}"
 echo "========================================"
 
-# 0. 应用网络优化参数
-echo "[0/6] 应用网络优化参数..."
-# 尝试应用sysctl设置（需要特权容器）
-sudo sysctl -p /etc/sysctl.conf 2>/dev/null || echo "  部分sysctl参数需要额外权限，跳过..."
-
-# TCP连接优化 - 针对Tailscale隧道
-sudo sysctl -w net.ipv4.tcp_fast_open=3 2>/dev/null || true
-sudo sysctl -w net.ipv4.tcp_congestion_control=bbr 2>/dev/null || true
-
 # 1. 启动 Tailscale
 echo "[1/6] 启动 Tailscale..."
 sudo tailscaled --tun=userspace-networking --socks5-server=localhost:1055 \
@@ -52,18 +43,19 @@ echo "[3/6] 启动 TigerVNC 服务器 (端口: 5900, 分辨率: ${GEOMETRY})..."
 vncserver -kill :1 2>/dev/null || true
 sleep 1
 
-# VNC 配置优化 - 针对网络性能
+# VNC 配置优化 - 针对慢链路/中继场景
+# 16 位色深相比 24 位可省约 1/3 带宽，交互体感更顺
 mkdir -p ~/.vnc
 cat > ~/.vnc/config << EOF
 geometry=${GEOMETRY}
-depth=24
+depth=16
 rfbport=5900
 localhost=no
 alwaysshared
 EOF
 
-# 启动VNC服务器
-vncserver :1 -xstartup 'cinnamon-session' -geometry ${GEOMETRY} -depth 24 -rfbport 5900 -rfbauth ~/.vnc/passwd -alwaysshared &
+# 启动VNC服务器（16 位色深）
+vncserver :1 -xstartup 'cinnamon-session' -geometry ${GEOMETRY} -depth 16 -rfbport 5900 -rfbauth ~/.vnc/passwd -alwaysshared &
 sleep 2
 
 # 4. 配置并启动 noVNC
@@ -212,14 +204,15 @@ echo "========================================"
 echo ""
 echo "连接方式:"
 echo "  • SSH 连接:    ssh root@<Tailscale-IP>  (密码: codespace)"
+echo "  • mosh 连接:   mosh --ssh=\"ssh -p 22\" root@<Tailscale-IP>  (慢链路推荐，本地预测回显)"
 echo "  • VNC 客户端:  <Tailscale-IP>:5900  (密码: password)"
 echo "  • Web VNC:     访问转发的 6080 端口 -> /vnc.html"
 echo "  • RDP 客户端:  <Tailscale-IP>:3389 (用户: root, 密码: password)"
 echo ""
-echo "网络优化已启用:"
-echo "  • TCP Fast Open: 已启用"
-echo "  • BBR 拥塞控制: 已启用"
+echo "性能相关:"
+echo "  • VNC 色深: 16 位 (相比 24 位省约 1/3 带宽)"
 echo "  • 分辨率固定: ${GEOMETRY}"
+echo "  • SSH 卡顿请优先用 mosh; VNC 客户端建议设 Tight 编码 + JPEG 质量 4~6"
 echo ""
 echo "保持运行中... (按 Ctrl+C 停止)"
 
