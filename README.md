@@ -128,7 +128,7 @@ sudo tailscale up
 ## ⛔ 局限性与错误
 - 无法启用硬件加速，因为 Codespace 不具备 GPU，系统语言汉化不完整
 - 由于Tailscale的限制，AuthKey有效期最长为90天，过期后请重新生成Key，并将其填入仓库的环境变量中
-- Cloudshell版本目前仅支持VNC连接，且只有HOME目录有持久化存储
+- CloudShell 版本现已支持 SSH/RDP/VNC/Web/mosh 五种连接方式（与 Codespaces 对齐），详见 [GCSLEARN.md](GCSLEARN.md)。注意 CloudShell 只有 HOME 目录持久化，Docker 镜像层每会话清空（脚本已用 `$HOME` 镜像缓存规避重复构建）
 
 ## 🚀 网络优化
 容器已针对慢链路/中继场景做了实际有效的调整：
