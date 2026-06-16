@@ -52,12 +52,14 @@ ENV GLFW_IM_MODULE=ibus
 # 安装 Tailscale
 RUN curl -fsSL https://tailscale.com/install.sh | sh
 
-# 安装 xrdp (RDP服务器)、Xorg 后端和 OpenSSH 服务器
+# 安装 xrdp (RDP服务器)、Xorg 后端、OpenSSH 服务器和 mosh
+# mosh 走 UDP + 本地预测回显，在高延迟/中继链路下交互体感远好于纯 SSH
 RUN apt-get update && \
     apt-get install -y \
         xrdp \
         xorgxrdp \
-        openssh-server && \
+        openssh-server \
+        mosh && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
@@ -77,16 +79,6 @@ RUN sed -i 's/^port=3350/port=-1/' /etc/xrdp/sesman.ini && \
     sed -i 's/^crypt_level=.*/crypt_level=high/' /etc/xrdp/xrdp.ini && \
     sed -i 's/^max_bpp=.*/max_bpp=24/' /etc/xrdp/xrdp.ini && \
     sed -i 's/^#xserverbpp=24/xserverbpp=24/' /etc/xrdp/xrdp.ini
-
-# 配置网络优化 - TCP性能调整
-RUN echo '# 网络性能优化' >> /etc/sysctl.conf && \
-    echo 'net.ipv4.tcp_fast_open = 3' >> /etc/sysctl.conf && \
-    echo 'net.core.rmem_max = 16777216' >> /etc/sysctl.conf && \
-    echo 'net.core.wmem_max = 16777216' >> /etc/sysctl.conf && \
-    echo 'net.ipv4.tcp_rmem = 4096 87380 16777216' >> /etc/sysctl.conf && \
-    echo 'net.ipv4.tcp_wmem = 4096 65536 16777216' >> /etc/sysctl.conf && \
-    echo 'net.ipv4.tcp_congestion_control = bbr' >> /etc/sysctl.conf && \
-    echo 'net.ipv4.tcp_notsent_lowat = 16384' >> /etc/sysctl.conf
 
 # 设置 xrdp 用户权限
 RUN usermod -a -G ssl-cert xrdp && \
